@@ -15,11 +15,12 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 }, 100000)
 
-test('notes are returned as json', async () => {
-  await api
+test('notes are returned as json with right length', async () => {
+  const blogs = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
+  expect(blogs.body).toHaveLength(helper.initialBlogs.length)
 }, 100000)
 
 test('identifier is named "id"', async () => {
@@ -119,6 +120,24 @@ test('a valid blog can be deleted', async () => {
   expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
 
   expect(blogsAtEnd).not.toContainEqual(blogToDelete)
+}, 100000)
+
+test('likes can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+  const newBlog = {
+    ...blogToUpdate,
+    likes: blogToUpdate.likes + 1
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newBlog)
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  const updatedBlog = blogsAtEnd.find(blog => blog.id == blogToUpdate.id)
+  expect(updatedBlog.likes).toBe(blogToUpdate.likes + 1)
 }, 100000)
 
 afterAll(async () => {

@@ -1,4 +1,5 @@
-const { response } = require("express")
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const errorHandler = (error, _request, response, next) => {
   if (error.name === 'CastError') {
@@ -23,8 +24,23 @@ const tokenExtractor = (request, _response, next) => {
   next()
 }
 
+const userExtractor = async (request, _response, next) => {
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    request.user = await User.findById(decodedToken.id)
+  } catch (error) {
+    next(error)
+  }
+  next()
+}
+
 module.exports = {
   unknownEndpoint,
   errorHandler,
-  tokenExtractor
+  tokenExtractor,
+  userExtractor
 }

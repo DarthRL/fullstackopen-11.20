@@ -2,17 +2,28 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 const app = require('../app')
 mongoose.set("bufferTimeoutMS", 30000)
 
 const api = supertest(app)
+let authorization = ''
 
 beforeEach(async () => {
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+  await user.save()
+
   await Blog.deleteMany({})
-  const noteObjects = helper.initialBlogs
+  const blogObjects = helper.initialBlogs
     .map(blog => new Blog(blog))
-  const promiseArray = noteObjects.map(blog => blog.save())
+  blogObjects.forEach(blog => blog.user = user._id)
+  const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+  authorization = await api.post('/api/login').send({ username: 'root', password: 'sekret' })
+  authorization = `Bearer ${authorization.body.token}`
 }, 100000)
 
 test('notes are returned as json with right length', async () => {
@@ -40,6 +51,7 @@ test('a valid blog can be added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', authorization)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -70,6 +82,7 @@ test('missing "likes" defaults to 0', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', authorization)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -99,11 +112,13 @@ test('missing title or url returns 400', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', authorization)
     .send(newBlog1)
     .expect(400)
 
   await api
     .post('/api/blogs')
+    .set('Authorization', authorization)
     .send(newBlog2)
     .expect(400)
 }, 100000)
@@ -114,12 +129,27 @@ test('a valid blog can be deleted', async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', authorization)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
 
   expect(blogsAtEnd).not.toContainEqual(blogToDelete)
+}, 100000)
+
+test('a blog cannot be deleted without token', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(401)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
+
+  expect(blogsAtEnd).toContainEqual(blogToDelete)
 }, 100000)
 
 test('likes can be updated', async () => {

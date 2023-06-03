@@ -61,7 +61,7 @@ const App = () => {
     }
   }
 
-  const handleCreate = async (event) => {
+  const handleCreate = (event) => {
     event.preventDefault()
     try {
       blogService.create({

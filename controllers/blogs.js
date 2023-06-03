@@ -14,6 +14,9 @@ blogsRouter.post('/', async (request, response, next) => {
     const body = request.body
 
     const user = request.user
+    if (!(user && user.id)) {
+      response.status(401).end()
+    }
     const blog = new Blog({
       ...body,
       user: user._id

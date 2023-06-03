@@ -8,6 +8,9 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -20,6 +23,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -30,9 +34,10 @@ const App = () => {
       const user = await loginService.login({
         username, password
       })
+      blogService.setToken(user.token)
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      )
+        )
       setUser(user)
       setUsername('')
       setPassword('')
@@ -44,6 +49,7 @@ const App = () => {
   const handleLogout = async (event) => {
     event.preventDefault()
     try {
+      blogService.setToken('')
       window.localStorage.removeItem(
         'loggedBlogappUser'
       )
@@ -53,6 +59,23 @@ const App = () => {
     }
   }
 
+  const handleCreate = async (event) => {
+    event.preventDefault()
+    try {
+      blogService.create({
+        title: title,
+        author: author,
+        url: url
+      }).then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+      })
+    } catch (exception) {
+      console.log(exception)
+    }
+  }
 
   if (user === null) {
     return (
@@ -92,6 +115,28 @@ const App = () => {
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
+      <h2>create new</h2>
+      <form onSubmit={handleCreate}>
+        <div>title:<input 
+          type='text'
+          value={title}
+          name='title'
+          onChange={({target}) => setTitle(target.value)}
+        /></div>
+        <div>author:<input 
+          type='text'
+          value={author}
+          name='author'
+          onChange={({target}) => setAuthor(target.value)}
+        /></div>
+        <div>url:<input 
+          type='text'
+          value={url}
+          name='url'
+          onChange={({target}) => setUrl(target.value)}
+        /></div>
+        <button type='submit'>create</button>
+      </form>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +12,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -37,12 +39,12 @@ const App = () => {
       blogService.setToken(user.token)
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-        )
+      )
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log(exception)
+      showMessage(exception.response.data.error, "error")
     }
   }
 
@@ -67,20 +69,29 @@ const App = () => {
         author: author,
         url: url
       }).then(returnedBlog => {
+        showMessage(`a new blog ${title} by ${author} added`, "notification")
         setBlogs(blogs.concat(returnedBlog))
         setTitle('')
         setAuthor('')
         setUrl('')
       })
     } catch (exception) {
-      console.log(exception)
+      showMessage(exception.response.data.error, "error")
     }
+  }
+
+  const showMessage = (text, type) => {
+    setMessage({text, type})
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
   }
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
+        <Notification message={message} />
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -108,6 +119,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={message} />
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
@@ -117,23 +129,23 @@ const App = () => {
       )}
       <h2>create new</h2>
       <form onSubmit={handleCreate}>
-        <div>title:<input 
+        <div>title:<input
           type='text'
           value={title}
           name='title'
-          onChange={({target}) => setTitle(target.value)}
+          onChange={({ target }) => setTitle(target.value)}
         /></div>
-        <div>author:<input 
+        <div>author:<input
           type='text'
           value={author}
           name='author'
-          onChange={({target}) => setAuthor(target.value)}
+          onChange={({ target }) => setAuthor(target.value)}
         /></div>
-        <div>url:<input 
+        <div>url:<input
           type='text'
           value={url}
           name='url'
-          onChange={({target}) => setUrl(target.value)}
+          onChange={({ target }) => setUrl(target.value)}
         /></div>
         <button type='submit'>create</button>
       </form>

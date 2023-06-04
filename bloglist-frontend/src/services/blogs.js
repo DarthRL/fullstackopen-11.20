@@ -4,7 +4,7 @@ const baseUrl = '/api/blogs'
 let token = null
 
 const setToken = newToken => {
-  if (newToken == null) {
+  if (newToken === null) {
     token = null
     return
   }
@@ -25,7 +25,7 @@ const create = async newObject => {
   return response.data
 }
 
-const update = async ({id, newObject}) => {
+const update = async ({ id, newObject }) => {
   const response = await axios.put(`${baseUrl}/${id}`, newObject)
   return response.data
 }
@@ -39,5 +39,5 @@ const deleteBlog = async (id) => {
   return response
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
+
 export default { getAll, create, setToken, update, deleteBlog }

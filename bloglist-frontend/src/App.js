@@ -47,7 +47,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      showMessage(exception.response.data.error, "error")
+      showMessage(exception.response.data.error, 'error')
     }
   }
 
@@ -71,14 +71,14 @@ const App = () => {
       author: author,
       url: url
     }).then(returnedBlog => {
-      showMessage(`a new blog ${title} by ${author} added`, "notification")
+      showMessage(`a new blog ${title} by ${author} added`, 'notification')
       setBlogs(blogs.concat(returnedBlog))
       setTitle('')
       setAuthor('')
       setUrl('')
       blogFormRef.current.toggleVisibility()
     }).catch((exception) => {
-      showMessage(exception.response.data.error, "error")
+      showMessage(exception.response.data.error, 'error')
     })
 
 
@@ -97,17 +97,17 @@ const App = () => {
     }).then(returnedBlog => {
       setBlogs(blogs.map(blog => blog.id !== returnedBlog.id ? blog : returnedBlog))
     }).catch((exception) => {
-      showMessage(exception.response.data.error, "error")
+      showMessage(exception.response.data.error, 'error')
     })
   }
 
   const handleRemove = (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       blogService.deleteBlog(blog.id).then(() => {
-        showMessage(`blog ${blog.title} by ${blog.author} removed`, "notification")
+        showMessage(`blog ${blog.title} by ${blog.author} removed`, 'notification')
         setBlogs(blogs.filter(b => b.id !== blog.id))
       }).catch((exception) => {
-        showMessage(exception.response.data.error, "error")
+        showMessage(exception.response.data.error, 'error')
       })
     }
   }

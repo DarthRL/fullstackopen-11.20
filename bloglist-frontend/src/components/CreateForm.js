@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const CreateForm = ({
   handleSubmit,
   title,
@@ -34,4 +36,15 @@ const CreateForm = ({
     </div>
   )
 }
+
+CreateForm.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  handleTitleChange: PropTypes.func.isRequired,
+  author: PropTypes.string.isRequired,
+  handleAuthorChange: PropTypes.func.isRequired,
+  url: PropTypes.string.isRequired,
+  handleUrlChange: PropTypes.func.isRequired
+}
+
 export default CreateForm

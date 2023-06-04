@@ -16,7 +16,7 @@ const App = () => {
   const [url, setUrl] = useState('')
   const [message, setMessage] = useState(null)
   const blogFormRef = useRef()
-  
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
@@ -84,6 +84,25 @@ const App = () => {
     }
   }
 
+  const handleLike = (blog) => {
+    try {
+      blogService.put({
+        id: blog.id,
+        newObject: {
+          title: blog.title,
+          author: blog.author,
+          url: blog.url,
+          likes: blog.likes + 1,
+          user: blog.user.id
+        }
+      }).then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== returnedBlog.id ? blog : returnedBlog ))
+      })
+    } catch (exception) {
+      showMessage(exception.response.data.error, "error")
+    }
+  }
+
   const showMessage = (text, type) => {
     setMessage({ text, type })
     setTimeout(() => {
@@ -141,7 +160,7 @@ const App = () => {
         />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLike={handleLike} />
       )}
     </div>
   )

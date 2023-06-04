@@ -66,40 +66,49 @@ const App = () => {
 
   const handleCreate = (event) => {
     event.preventDefault()
-    try {
-      blogService.create({
-        title: title,
-        author: author,
-        url: url
-      }).then(returnedBlog => {
-        showMessage(`a new blog ${title} by ${author} added`, "notification")
-        setBlogs(blogs.concat(returnedBlog))
-        setTitle('')
-        setAuthor('')
-        setUrl('')
-      })
+    blogService.create({
+      title: title,
+      author: author,
+      url: url
+    }).then(returnedBlog => {
+      showMessage(`a new blog ${title} by ${author} added`, "notification")
+      setBlogs(blogs.concat(returnedBlog))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
       blogFormRef.current.toggleVisibility()
-    } catch (exception) {
+    }).catch((exception) => {
       showMessage(exception.response.data.error, "error")
-    }
+    })
+
+
   }
 
   const handleLike = (blog) => {
-    try {
-      blogService.put({
-        id: blog.id,
-        newObject: {
-          title: blog.title,
-          author: blog.author,
-          url: blog.url,
-          likes: blog.likes + 1,
-          user: blog.user.id
-        }
-      }).then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== returnedBlog.id ? blog : returnedBlog ))
-      })
-    } catch (exception) {
+    blogService.update({
+      id: blog.id,
+      newObject: {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes + 1,
+        user: blog.user.id
+      }
+    }).then(returnedBlog => {
+      setBlogs(blogs.map(blog => blog.id !== returnedBlog.id ? blog : returnedBlog))
+    }).catch((exception) => {
       showMessage(exception.response.data.error, "error")
+    })
+  }
+
+  const handleRemove = (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      blogService.deleteBlog(blog.id).then(() => {
+        showMessage(`blog ${blog.title} by ${blog.author} removed`, "notification")
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+      }).catch((exception) => {
+        showMessage(exception.response.data.error, "error")
+      })
     }
   }
 
@@ -161,8 +170,8 @@ const App = () => {
       </Togglable>
       {blogs.sort((a, b) => (b.likes - a.likes))
         .map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={handleLike} />
-      )}
+          <Blog key={blog.id} blog={blog} handleLike={handleLike} handleRemove={handleRemove} user={user} />
+        )}
     </div>
   )
 }

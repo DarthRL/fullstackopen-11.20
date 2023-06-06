@@ -1,35 +1,46 @@
 import PropTypes from 'prop-types'
+import { useState } from 'react'
 
 const CreateForm = ({
-  handleSubmit,
-  title,
-  handleTitleChange,
-  author,
-  handleAuthorChange,
-  url,
-  handleUrlChange
+  handleSubmit
 }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+  const create = (event) => {
+    event.preventDefault()
+    const newBlog = {
+      title: title,
+      author: author,
+      url: url
+    }
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+    handleSubmit(newBlog)
+  }
+
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={create}>
         <div>title:<input
           type='text'
           value={title}
           name='title'
-          onChange={handleTitleChange}
+          onChange={({ target }) => setTitle(target.value)}
         /></div>
         <div>author:<input
           type='text'
           value={author}
           name='author'
-          onChange={handleAuthorChange}
+          onChange={({ target }) => setAuthor(target.value)}
         /></div>
         <div>url:<input
           type='text'
           value={url}
           name='url'
-          onChange={handleUrlChange}
+          onChange={({ target }) => setUrl(target.value)}
         /></div>
         <button type='submit'>create</button>
       </form>
@@ -38,13 +49,7 @@ const CreateForm = ({
 }
 
 CreateForm.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  handleTitleChange: PropTypes.func.isRequired,
-  author: PropTypes.string.isRequired,
-  handleAuthorChange: PropTypes.func.isRequired,
-  url: PropTypes.string.isRequired,
-  handleUrlChange: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired
 }
 
 export default CreateForm

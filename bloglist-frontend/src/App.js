@@ -11,9 +11,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [message, setMessage] = useState(null)
   const blogFormRef = useRef()
 
@@ -64,24 +61,15 @@ const App = () => {
     }
   }
 
-  const handleCreate = (event) => {
-    event.preventDefault()
-    blogService.create({
-      title: title,
-      author: author,
-      url: url
-    }).then(returnedBlog => {
-      showMessage(`a new blog ${title} by ${author} added`, 'notification')
-      setBlogs(blogs.concat(returnedBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      blogFormRef.current.toggleVisibility()
-    }).catch((exception) => {
-      showMessage(exception.response.data.error, 'error')
-    })
-
-
+  const handleCreate = (newBlog) => {
+    blogService.create(newBlog)
+      .then(returnedBlog => {
+        showMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`, 'notification')
+        setBlogs(blogs.concat(returnedBlog))
+        blogFormRef.current.toggleVisibility()
+      }).catch((exception) => {
+        showMessage(exception.response.data.error, 'error')
+      })
   }
 
   const handleLike = (blog) => {
@@ -160,12 +148,6 @@ const App = () => {
       <Togglable buttonLabel='new note' ref={blogFormRef}>
         <CreateForm
           handleSubmit={handleCreate}
-          title={title}
-          handleTitleChange={({ target }) => setTitle(target.value)}
-          author={author}
-          handleAuthorChange={({ target }) => setAuthor(target.value)}
-          url={url}
-          handleUrlChange={({ target }) => setUrl(target.value)}
         />
       </Togglable>
       {blogs.sort((a, b) => (b.likes - a.likes))

@@ -21,7 +21,7 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
   const showWhenRemoveVisible = { display: blog.user.username === user.username ? '' : 'none' }
 
   return (
-    <div className = 'blogTitle' style={blogStyle}>
+    <div className = 'blog' style={blogStyle}>
       {blog.title} {blog.author} <button onClick={toggleDetailVisible}>{buttonText}</button>
       <div style={showWhenDetailVisible} className='togglableContent'>
         <div className='blogUrl'>{blog.url}</div>

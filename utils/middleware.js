@@ -25,7 +25,7 @@ const tokenExtractor = (request, _response, next) => {
   next()
 }
 
-const userExtractor = async (request, _response, next) => {
+const userExtractor = async (request, response, next) => {
   try {
     if (request.token) {
       const decodedToken = jwt.verify(request.token, process.env.SECRET)

@@ -16,6 +16,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+      - name: 'Create env file'
+        run: |
+          echo "${{ secrets.ENV }}" > .env
       - run: npm install
       - run: npm run eslint
       - run: npm test

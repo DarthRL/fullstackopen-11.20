@@ -19,17 +19,20 @@ jobs:
       - name: 'Create env file'
         run: |
           echo "${{ secrets.ENV }}" > .env
-      - run: npm install
-      - run: npm run eslint
-      - run: npm test
-      - run: npm start &
-      - run: cd bloglist-frontend
-      - run: npm install
-      - run: npm run eslint
-      - run: npm test
+      - name: 'Test backend'
+        run: npm install
+          npm run eslint
+          npm test
+          npm start &
+      - name: 'Test frontend'
+        working-directory: ./bloglist-frontend
+        run: npm install
+          npm run eslint
+          npm test
       - name: e2e tests
         uses: cypress-io/github-action@v5
         with:
+          working-directory: ./bloglist-frontend
           command: npm run test:e2e
           start: npm run start-prod
           wait-on: http://localhost:3000

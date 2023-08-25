@@ -6,7 +6,8 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development nodemon index.js",
-    "test": "NODE_ENV=test jest --verbose --runInBand",
+    "test": "NODE_ENV=test jest --verbose --runInBand --forceExit",
+    "test:detect": "NODE_ENV=test jest --verbose --runInBand --detectOpenHandles",
     "start:test": "NODE_ENV=test node index.js"
   },
   "author": "DarthRL",
@@ -28,6 +29,7 @@
     "supertest": "^6.3.3"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["bloglist-frontend"]
   }
 }

@@ -28,7 +28,7 @@ describe('<Blog />', () => {
   })
 
   test('renders content', async () => {
-    const title = container.querySelector('.blogTitle')
+    const title = container.querySelector('.blog')
     expect(title).toBeVisible()
     expect(title).toHaveTextContent('title1 author1')
   })

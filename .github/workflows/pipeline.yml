@@ -22,7 +22,7 @@ jobs:
       - run: npm install
       - run: npm run eslint
       - run: npm test
-      - run: npm start &
+      - run: npm run start:test &
       - name: 'Install in frontend'
         working-directory: ./bloglist-frontend
         run: npm install
@@ -32,6 +32,9 @@ jobs:
       - name: 'Test frontend'
         working-directory: ./bloglist-frontend
         run: npm test
+      - name: 'Build frontend'
+        working-directory: ./bloglist-frontend
+        run: npm run build
       - name: e2e tests
         uses: cypress-io/github-action@v5
         with:

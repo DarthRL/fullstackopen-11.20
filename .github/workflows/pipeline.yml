@@ -22,7 +22,6 @@ jobs:
       - run: npm install
       - run: npm run eslint
       - run: npm test
-      - run: npm run start:test &
       - name: 'Install in frontend'
         working-directory: ./bloglist-frontend
         run: npm install
@@ -40,8 +39,8 @@ jobs:
         with:
           working-directory: ./bloglist-frontend
           command: npm run test:e2e
-          start: npm run start-prod
-          wait-on: http://localhost:3000
+          start: cd ..; npm run start:test
+          wait-on: http://localhost:3003
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       

@@ -39,7 +39,7 @@ jobs:
         with:
           working-directory: ./bloglist-frontend
           command: npm run test:e2e
-          start: cd ..; npm run start:test
+          start: npm --prefix .. run start:test
           wait-on: http://localhost:3003
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}

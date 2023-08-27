@@ -43,6 +43,23 @@ jobs:
           wait-on: http://localhost:3003
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') && success() }}
+      - name: Notify Success
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') && success() }}
+        with:
+            severity: info
+            text: A new version of bloglist deployed
+            description: to https://lively-resonance-1025.fly.dev/ by ${{ github.event.head_commit.author.name }}
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Notify Failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') &&  failure() }}
+        with:
+            severity: error
+            text: Build failed
+            description: commit ${{ github.event.head_commit.url }} by ${{ github.event.head_commit.author.name }} broke the build :(
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       
   tag_release:
     needs: [simple_deployment_pipeline]
